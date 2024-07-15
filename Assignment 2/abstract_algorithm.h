@@ -1,6 +1,7 @@
 #ifndef ROBOT_ALGORITHM_H__
 #define ROBOT_ALGORITHM_H__
 
+
 #include <cstddef>
 
 #include "enums.h"
