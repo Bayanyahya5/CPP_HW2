@@ -6,7 +6,8 @@
 #include <iostream>
 #include <limits>
 
-void MySimulator::readHouseFile(const std::string& houseFilePath) {
+void MySimulator::readHouseFile(const std::string& houseFilePath) 
+{
     std::ifstream file(houseFilePath);
     if (!file.is_open()) {
         std::cerr << "Failed to open house file.\n";
