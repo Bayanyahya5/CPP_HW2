@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 #include "MyAlgorithm.h"
-#include "WallsSensor.h"
-#include "DirtSensor.h"
-#include "BatteryMeter.h"
+#include "wall_sensor.h"
+#include "dirt_sensor.h"
+#include "battery_meter.h"
 
 class MySimulator {
 public:

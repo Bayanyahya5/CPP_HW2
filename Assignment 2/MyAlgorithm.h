@@ -1,10 +1,10 @@
 #ifndef MYALGORITHM_H
 #define MYALGORITHM_H
 
-#include "AbstractAlgorithm.h"
-#include "WallsSensor.h"
-#include "DirtSensor.h"
-#include "BatteryMeter.h"
+#include "abstract_algorithm.h"
+#include "wall_sensor.h"
+#include "dirt_sensor.h"
+#include "battery_meter.h"
 #include <set>
 #include <stack>
 #include <queue>
