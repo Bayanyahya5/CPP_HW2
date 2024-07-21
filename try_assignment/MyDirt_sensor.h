@@ -9,7 +9,7 @@ public:
     MyDirt_sensor(const std::vector<std::vector<int>>& dirtLevels, int row, int col);
     int dirtLevel() const override;
     void setPosition(int row, int col);
-
+    int houseDirtLevel() const;
 private:
     const std::vector<std::vector<int>>& dirtLevels_;
     int row_;
