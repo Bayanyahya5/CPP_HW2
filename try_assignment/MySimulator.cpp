@@ -67,12 +67,11 @@ void MySimulator::setAlgorithm(MyAlgorithm &algo)
 void MySimulator::run()
 {
     currentStep_ = 0;
-    bool first_step = true;
     while (currentStep_ < maxSteps_ && batteryMeter_->getBatteryState() != 0)
     {
         if (batteryMeter_->getBatteryState() <= back_steps_.size() + 1 && maxSteps_ > (currentStep_ + back_steps_.size())) /// can return to the docking station cause return will not pass the legal number of maxSteps
         {
-            if (batteryMeter_->getBatteryState() <= back_steps_.size() + 1 && dirtSensor_->dirtLevel() > 0)
+            if (batteryMeter_->getBatteryState() == back_steps_.size() + 1 && dirtSensor_->dirtLevel() > 0)
             {
                 steps_.push_back('s');
                 dirtLevels_[currentRow_][currentCol_]--;
@@ -86,22 +85,13 @@ void MySimulator::run()
         Step step = algo_.nextStep();
         steps_.push_back("NESWsF"[static_cast<int>(step)]);
 
-        if (first_step)
-        {
-            if (step == Step::Stay)
-            {
-                break;
-            }
-            first_step = false;
-        }
-
         if (step == Step::Finish)
         {
             break;
         }
         else if (step == Step::Stay)
         {
-            dirtLevels_[currentRow_][currentCol_]--;
+            dirtLevels_[currentRow_][currentCol_]--; /////////////////////////////// remove dirtLevels_ and stay with one victor
         }
         else
         {
@@ -174,4 +164,5 @@ void MySimulator::need_charge()
         currentStep_++;
         steps_.push_back('s');
     }
+    updateSensors();
 }
