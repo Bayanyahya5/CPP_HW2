@@ -6,6 +6,7 @@
 
 void MySimulator::readHouseFile(const std::string &houseFilePath)
 {
+    try{
     std::ifstream file(houseFilePath);
     if (!file.is_open())
     {
@@ -59,6 +60,11 @@ void MySimulator::readHouseFile(const std::string &houseFilePath)
     wallsSensor_ = std::make_unique<MyWall_sensor>(house_, currentRow_, currentCol_);
     dirtSensor_ = std::make_unique<MyDirt_sensor>(dirtLevels_, currentRow_, currentCol_);
     batteryMeter_ = std::make_unique<MyBattery_meter>(maxBattery_);
+    
+    }
+        catch(const std::exception &e){
+        std::cout << "--> Standard exception: " << e.what() << std::endl;
+    }
 }
 
 void MySimulator::setAlgorithm(MyAlgorithm &algo)

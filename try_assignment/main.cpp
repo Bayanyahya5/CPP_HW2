@@ -4,6 +4,7 @@
 
 int main(int argc, char **argv)
 {
+    try{
     if (argc != 2)
     {
         std::cerr << "Usage: " << argv[0] << " <house_file_path>" << std::endl;
@@ -17,6 +18,9 @@ int main(int argc, char **argv)
     MyAlgorithm algo;
     simulator.setAlgorithm(algo);
     simulator.run();
-
+    }
+    catch(const std::exception &e){
+        std::cout << "--> Standard exception: " << e.what() << std::endl;
+    }
     return 0;
 }
