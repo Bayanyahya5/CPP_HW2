@@ -5,7 +5,7 @@ MyBattery_meter::MyBattery_meter(std::size_t maxBattery)
 
 std::size_t MyBattery_meter::getBatteryState() const
 {
-    return batteryState_; /////////////////////////// batteryState is double but the return value is size t, check if need to change to return std::size_t(batteryState_)
+    return batteryState_;
 }
 
 void MyBattery_meter::decreaseBattery()

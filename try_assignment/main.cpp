@@ -2,6 +2,12 @@
 #include "MyAlgorithm.h"
 #include <iostream>
 
+/**
+ * @brief Main function to run the vacuum cleaner simulation.
+ * @param argc Number of command line arguments.
+ * @param argv Array of command line arguments.
+ * @return Exit status.
+ */
 int main(int argc, char **argv)
 {
     try{

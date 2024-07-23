@@ -6,14 +6,30 @@
 #include <memory>
 #include "MyAlgorithm.h"
 
+/**
+ * @class MySimulator
+ * @brief Manages the simulation of the vacuum cleaner.
+ */
 class MySimulator
 {
 public:
-    void readHouseFile(const std::string &houseFilePath);
-    void setAlgorithm(MyAlgorithm &algo);
-    void run();
 
-    void printBack();
+    /**
+     * @brief Read the house configuration from a file.
+     * @param houseFilePath The path to the house file.
+     */
+    void readHouseFile(const std::string &houseFilePath);
+
+    /**
+     * @brief Set the algorithm to be used in the simulation.
+     * @param algo The algorithm.
+     */
+    void setAlgorithm(MyAlgorithm &algo);
+
+    /**
+     * @brief Run the simulation.
+     */
+    void run();
 
 private:
     MyAlgorithm algo_;
@@ -31,10 +47,24 @@ private:
     std::size_t currentSteps_;
     std::vector<char> steps_;
     std::vector<char> back_steps_;
-    int pathDirtCnt;
+    std::string houseFileName;
 
+    /**
+     * @brief Update the sensors with the current position.
+     */
     void updateSensors();
+
+    /**
+     * @brief Handle the need to charge the battery.
+     */
     void need_charge();
+
+    /**
+     * @brief Check if the current step is a back step.
+     * @param new_step The new step.
+     * @param old_step The old step.
+     * @return True if the current step is a back step, false otherwise.
+     */
     bool step_back(char new_step, char old_step);
 };
 

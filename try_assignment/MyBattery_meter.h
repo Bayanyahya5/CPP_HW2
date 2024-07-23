@@ -3,12 +3,24 @@
 
 #include "battery_meter.h"
 
+/**
+ * @class MyBattery_meter
+ * @brief A concrete implementation of the BatteryMeter class.
+ */
 class MyBattery_meter : public BatteryMeter
 {
 public:
     MyBattery_meter(std::size_t maxBattery);
     std::size_t getBatteryState() const override;
+
+    /**
+     * @brief Decrease the battery state by one step.
+     */
     void decreaseBattery();
+
+    /**
+     * @brief Charge the battery.
+     */
     void chargeBattery();
 
 private:
