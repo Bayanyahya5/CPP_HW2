@@ -98,9 +98,14 @@ void MySimulator::need_charge()
         cnt++;
     }
 
-    // if(currentSteps_ == maxSteps_){
-    //     currentSteps_ -= cnt;////////////////////////////////////////////// check this (Finshed condition) (if we arrived during charging)
-    // }
+    if(currentSteps_ >= maxSteps_ - 1){
+        currentSteps_ -= cnt;
+        for (int i = 0; i < cnt; i++)
+        {
+            steps_.pop_back();
+        }
+        steps_.push_back('F');
+    }
     updateSensors();
     pathDirtCnt = 0;
     algo_.clearVisited();
@@ -125,6 +130,9 @@ void MySimulator::run()
     pathDirtCnt = 0;
     while (currentSteps_ < maxSteps_ && batteryMeter_->getBatteryState() != 0)
     {
+        if(steps_.size() > 0 && steps_.back() == 'F'){
+            break;
+        }
         if (currentRow_ == dockingRow_ && currentCol_ == dockingCol_ && (maxSteps_ - currentSteps_) == 1)
         {
             steps_.push_back('F');
