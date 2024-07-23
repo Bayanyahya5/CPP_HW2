@@ -90,7 +90,7 @@ Step MyAlgorithm::nextStep()
     // Rearrange neighbors based on the group order
     for (int i = 0; i < 4; ++i)
     {
-        neighbors[i] = orig_neighbors[groups[index][i]];
+        neighbors[i] = orig_neighbors[groups[index][i] - 1];
     }
     index++;
     index = index % 24;
