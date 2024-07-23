@@ -17,12 +17,16 @@ void MySimulator::readHouseFile(const std::string &houseFilePath)
     std::getline(file, line); // House name
     std::getline(file, line); // MaxSteps
     maxSteps_ = std::stoi(line.substr(line.find('=') + 1));
+    // std::cout << "max steps: " << maxSteps_ << std::endl;
     std::getline(file, line); // MaxBattery
     maxBattery_ = std::stoi(line.substr(line.find('=') + 1));
+    // std::cout << "max battery: " << maxBattery_ << std::endl;
     std::getline(file, line); // Rows
     int rows = std::stoi(line.substr(line.find('=') + 1));
+    // std::cout << "rows: " << rows << std::endl;
     std::getline(file, line); // Cols
     int cols = std::stoi(line.substr(line.find('=') + 1));
+    // std::cout << "cols: " << cols << std::endl;
 
     house_.resize(rows, std::vector<char>(cols, ' '));
     dirtLevels_.resize(rows, std::vector<int>(cols, 0));
@@ -43,7 +47,9 @@ void MySimulator::readHouseFile(const std::string &houseFilePath)
                 dirtLevels_[row][col] = line[col] - '0';
             }
         }
-        ++row;
+        row++;
+        if (row == rows)
+            break;
     }
 
     file.close();
@@ -58,25 +64,83 @@ void MySimulator::readHouseFile(const std::string &houseFilePath)
 void MySimulator::setAlgorithm(MyAlgorithm &algo)
 {
     algo_ = algo;
-    algo.setMaxSteps(maxSteps_);
-    algo.setWallsSensor(*wallsSensor_);
-    algo.setDirtSensor(*dirtSensor_);
-    algo.setBatteryMeter(*batteryMeter_);
+    algo_.setMaxSteps(maxSteps_);
+    algo_.setWallsSensor(*wallsSensor_);
+    algo_.setDirtSensor(*dirtSensor_);
+    algo_.setBatteryMeter(*batteryMeter_);
+    algo_.setDockingStation(dockingRow_, dockingCol_);
+}
+
+void MySimulator::updateSensors()
+{
+    wallsSensor_->setPosition(currentRow_, currentCol_);
+    dirtSensor_->setPosition(currentRow_, currentCol_);
+    algo_.setPosition(currentRow_, currentCol_);
+}
+
+void MySimulator::need_charge()
+{
+    for (int i = back_steps_.size() - 1; i >= 0; i--)
+    {
+        steps_.push_back(back_steps_[i]);
+    }
+    currentRow_ = dockingRow_;
+    currentCol_ = dockingCol_;
+    currentSteps_ += back_steps_.size();
+    back_steps_.clear();
+
+    int cnt = 0;
+    while (currentSteps_ < maxSteps_ && batteryMeter_->getBatteryState() < maxBattery_)
+    {
+        batteryMeter_->chargeBattery();
+        currentSteps_++;
+        steps_.push_back('s'); ////// for debug change it to b
+        cnt++;
+    }
+
+    // if(currentSteps_ == maxSteps_){
+    //     currentSteps_ -= cnt;////////////////////////////////////////////// check this (Finshed condition) (if we arrived during charging)
+    // }
+    updateSensors();
+    pathDirtCnt = 0;
+    algo_.clearVisited();
+}
+
+bool MySimulator::step_back(char new_step, char old_step)
+{
+    if (new_step == 'N' && old_step == 'S')
+        return true;
+    if (new_step == 'S' && old_step == 'N')
+        return true;
+    if (new_step == 'E' && old_step == 'W')
+        return true;
+    if (new_step == 'W' && old_step == 'E')
+        return true;
+    return false;
 }
 
 void MySimulator::run()
 {
-    currentStep_ = 0;
-    while (currentStep_ < maxSteps_ && batteryMeter_->getBatteryState() != 0)
+    currentSteps_ = 0;
+    pathDirtCnt = 0;
+    while (currentSteps_ < maxSteps_ && batteryMeter_->getBatteryState() != 0)
     {
-        if (batteryMeter_->getBatteryState() <= back_steps_.size() + 1 && maxSteps_ > (currentStep_ + back_steps_.size())) /// can return to the docking station cause return will not pass the legal number of maxSteps
+        if (currentRow_ == dockingRow_ && currentCol_ == dockingCol_ && (maxSteps_ - currentSteps_) == 1)
+        {
+            steps_.push_back('F');
+            break;
+        }
+
+        if (batteryMeter_->getBatteryState() <= back_steps_.size() + 1 && maxSteps_ > (currentSteps_ + back_steps_.size())) /// can return to the docking station cause return will not pass the legal number of maxSteps
         {
             if (batteryMeter_->getBatteryState() == back_steps_.size() + 1 && dirtSensor_->dirtLevel() > 0)
             {
                 steps_.push_back('s');
-                dirtLevels_[currentRow_][currentCol_]--;
+                // dirtLevels_[currentRow_][currentCol_]--;
+                dirtSensor_->cleen();
                 batteryMeter_->decreaseBattery();
-                currentStep_++;
+                currentSteps_++;
+                pathDirtCnt++;
             }
             need_charge();
             continue;
@@ -91,7 +155,9 @@ void MySimulator::run()
         }
         else if (step == Step::Stay)
         {
-            dirtLevels_[currentRow_][currentCol_]--; /////////////////////////////// remove dirtLevels_ and stay with one victor
+            // dirtLevels_[currentRow_][currentCol_]--; /////////////////////////////// remove dirtLevels_ and stay with one victor
+            dirtSensor_->cleen();
+            pathDirtCnt++;
         }
         else
         {
@@ -119,17 +185,28 @@ void MySimulator::run()
             updateSensors();
         }
         batteryMeter_->decreaseBattery();
-        currentStep_++;
+        currentSteps_++;
+        if (back_steps_.size() >= 2)
+        {
+            if (step_back(back_steps_.back(), back_steps_[back_steps_.size() - 2]))
+            {
+                back_steps_.pop_back();
+                back_steps_.pop_back();
+            }
+        }
+        // printBack(); /////////////// for debuger
     }
 
     // Write output file
     std::ofstream outFile("output.txt");
-    outFile << "NumSteps = " << currentStep_ << "\n";
+    outFile << "NumSteps = " << currentSteps_ << "\n";
     outFile << "DirtLeft = " << dirtSensor_->houseDirtLevel() << "\n";
-    if(batteryMeter_->getBatteryState() == 0 && (currentRow_ != dockingRow_ || currentCol_ != dockingCol_)){
+    if (batteryMeter_->getBatteryState() == 0 && (currentRow_ != dockingRow_ || currentCol_ != dockingCol_))
+    {
         outFile << "Status = " << "DEAD" << "\n";
     }
-    else{
+    else
+    {
         outFile << "Status = " << ((steps_.back() == 'F') ? "FINISHED" : "WORKING") << "\n";
     }
     outFile << "Steps: ";
@@ -141,28 +218,11 @@ void MySimulator::run()
     outFile.close();
 }
 
-void MySimulator::updateSensors()
+void MySimulator::printBack() /////////////// for debuger
 {
-    wallsSensor_->setPosition(currentRow_, currentCol_);
-    dirtSensor_->setPosition(currentRow_, currentCol_);
-}
-
-void MySimulator::need_charge()
-{
-    for(int i = back_steps_.size() - 1; i >= 0; i--)
+    for (int i = 0; i < back_steps_.size(); i++)
     {
-        steps_.push_back(back_steps_[i]);
+        std::cout << back_steps_[i] << " ";
     }
-    currentRow_ =  dockingRow_;
-    currentCol_ = dockingCol_;
-    currentStep_ += back_steps_.size();
-    back_steps_.clear();
-
-    while(currentStep_ < maxSteps_ && batteryMeter_->getBatteryState() < maxBattery_)
-    {
-        batteryMeter_->chargeBattery();
-        currentStep_++;
-        steps_.push_back('s');
-    }
-    updateSensors();
+    std::cout << std::endl;
 }

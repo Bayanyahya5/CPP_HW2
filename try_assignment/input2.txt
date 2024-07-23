@@ -1,0 +1,10 @@
+2-Another Small house
+MaxSteps=100
+MaxBattery = 20
+Rows= 4
+Cols=12
+WWWWWWWWWWWW 0
+W D        W 1
+W 123456789W 2
+WWWWWWWWWWWW 3
+012345678901

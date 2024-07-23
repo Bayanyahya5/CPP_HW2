@@ -1,6 +1,6 @@
 #include "MyDirt_sensor.h"
 
-MyDirt_sensor::MyDirt_sensor(const std::vector<std::vector<int>> &dirtLevels, int row, int col)
+MyDirt_sensor::MyDirt_sensor(std::vector<std::vector<int>> &dirtLevels, int row, int col)
     : dirtLevels_(dirtLevels), row_(row), col_(col) {}
 
 int MyDirt_sensor::dirtLevel() const
@@ -15,7 +15,7 @@ void MyDirt_sensor::setPosition(int row, int col)
 }
 
 int MyDirt_sensor::houseDirtLevel() const
-{  
+{
     int dirtSum = 0;
     for (const std::vector<int> &row : dirtLevels_)
     {
@@ -25,4 +25,9 @@ int MyDirt_sensor::houseDirtLevel() const
         }
     }
     return dirtSum;
+}
+
+void MyDirt_sensor::cleen()
+{
+    dirtLevels_[row_][col_]--;
 }

@@ -1,0 +1,13 @@
+Sparse House
+MaxSteps=200
+MaxBattery=40
+Rows=8
+Cols=8
+WWWWWWWW
+W1D     W
+W 2     W
+W  3    W
+W   4   W
+W    5  W
+W     6 W
+WWWWWWWW

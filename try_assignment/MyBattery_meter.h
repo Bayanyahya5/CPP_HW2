@@ -3,7 +3,8 @@
 
 #include "battery_meter.h"
 
-class MyBattery_meter : public BatteryMeter {
+class MyBattery_meter : public BatteryMeter
+{
 public:
     MyBattery_meter(std::size_t maxBattery);
     std::size_t getBatteryState() const override;
